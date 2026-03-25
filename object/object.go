@@ -33,6 +33,29 @@ type Integer struct {
 func (i *Integer) Type() ObjectType { return INTEGER_OBJ }
 func (i *Integer) Inspect() string  { return fmt.Sprintf("%d", i.Value) }
 
+// integerCache pre-allocates Integer objects for small values [0, 255].
+// This eliminates heap allocations for the most common integer values
+// in typical programs (loop counters, boolean-like 0/1, small arithmetic).
+const intCacheMin = 0
+const intCacheMax = 255
+
+var integerCache [intCacheMax - intCacheMin + 1]*Integer
+
+func init() {
+	for i := int64(intCacheMin); i <= intCacheMax; i++ {
+		integerCache[i-intCacheMin] = &Integer{Value: i}
+	}
+}
+
+// CachedInteger returns a cached Integer if val is in [0, 255],
+// otherwise allocates a new one on the heap.
+func CachedInteger(val int64) *Integer {
+	if val >= intCacheMin && val <= intCacheMax {
+		return integerCache[val-intCacheMin]
+	}
+	return &Integer{Value: val}
+}
+
 type Boolean struct {
 	Value bool
 }
@@ -67,6 +90,34 @@ type Function struct {
 
 func (f *Function) Type() ObjectType { return FUNCTION_OBJ }
 func (f *Function) Inspect() string {
+	var out bytes.Buffer
+
+	params := []string{}
+	for _, p := range f.Parameters {
+		params = append(params, p.String())
+	}
+
+	out.WriteString("fn")
+	out.WriteString("(")
+	out.WriteString(strings.Join(params, ", "))
+	out.WriteString(") {\n")
+	out.WriteString(f.Body.String())
+	out.WriteString("\n}")
+
+	return out.String()
+}
+
+// ResolvedFunction is a function that captures a FastEnvironment
+// and a resolver.Table for array-indexed variable access.
+type ResolvedFunction struct {
+	Parameters []*ast.Identifier
+	Body       *ast.BlockStatement
+	Env        *FastEnvironment
+	Table      interface{} // resolver.Table — stored as interface to avoid import cycle
+}
+
+func (f *ResolvedFunction) Type() ObjectType { return FUNCTION_OBJ }
+func (f *ResolvedFunction) Inspect() string {
 	var out bytes.Buffer
 
 	params := []string{}

@@ -2,6 +2,8 @@
 
 A tree-walking interpreter for the [Monkey programming language](https://monkeylang.org/), built in Go by following Thorsten Ball's *Writing an Interpreter in Go* (chapters 1–3).
 
+See https://docs.google.com/document/d/110UmsQylotN2sh1FKxDoXX7jwXg-WeW_/edit for notes about project setup. 
+
 ## The Monkey Language
 
 ```

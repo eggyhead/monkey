@@ -41,7 +41,7 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 
 	// Expressions
 	case *ast.IntegerLiteral:
-		return &object.Integer{Value: node.Value}
+		return object.CachedInteger(node.Value)
 
 	case *ast.Boolean:
 		return nativeBoolToBooleanObject(node.Value)
@@ -188,7 +188,7 @@ func evalMinusPrefixOperatorExpression(right object.Object) object.Object {
 	}
 
 	value := right.(*object.Integer).Value
-	return &object.Integer{Value: -value}
+	return object.CachedInteger(-value)
 }
 
 func evalIntegerInfixExpression(
@@ -200,13 +200,13 @@ func evalIntegerInfixExpression(
 
 	switch operator {
 	case "+":
-		return &object.Integer{Value: leftVal + rightVal}
+		return object.CachedInteger(leftVal + rightVal)
 	case "-":
-		return &object.Integer{Value: leftVal - rightVal}
+		return object.CachedInteger(leftVal - rightVal)
 	case "*":
-		return &object.Integer{Value: leftVal * rightVal}
+		return object.CachedInteger(leftVal * rightVal)
 	case "/":
-		return &object.Integer{Value: leftVal / rightVal}
+		return object.CachedInteger(leftVal / rightVal)
 	case "<":
 		return nativeBoolToBooleanObject(leftVal < rightVal)
 	case ">":
