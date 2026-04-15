@@ -15,6 +15,7 @@ const (
 
 	INTEGER_OBJ = "INTEGER"
 	BOOLEAN_OBJ = "BOOLEAN"
+	STRING_OBJ = "STRING"
 
 	RETURN_VALUE_OBJ = "RETURN_VALUE"
 
@@ -32,6 +33,14 @@ type Integer struct {
 
 func (i *Integer) Type() ObjectType { return INTEGER_OBJ }
 func (i *Integer) Inspect() string  { return fmt.Sprintf("%d", i.Value) }
+
+
+type String struct {
+	Value string
+}
+
+func (s *String) Type() ObjectType { return STRING_OBJ }
+func (s *String) Inspect() string  { return s.Value }
 
 // integerCache pre-allocates Integer objects for small values [0, 255].
 // This eliminates heap allocations for the most common integer values

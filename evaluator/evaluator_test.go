@@ -304,6 +304,12 @@ ourFunction(20) + first + second;`
 	testIntegerObject(t, testEval(input), 70)
 }
 
+func TestStringLiteral(t *testing.T) {
+	input := `"Hello World!"`
+	evaluated := testEval(input)
+	testStringObject(t, evaluated, "Hello World!")
+}
+
 func testEval(input string) object.Object {
 	l := lexer.New(input)
 	p := parser.New(l)
@@ -311,6 +317,20 @@ func testEval(input string) object.Object {
 	env := object.NewEnvironment()
 
 	return Eval(program, env)
+}
+
+func testStringObject(t *testing.T, obj object.Object, expected string) bool {
+	result, ok := obj.(*object.String)
+	if !ok {
+		t.Errorf("object is not String. got=%T (%+v)", obj, obj)
+		return false
+	}
+	if result.Value != expected {
+		t.Errorf("object has wrong value. got=%q, want=%q",
+			result.Value, expected)
+		return false
+	}
+	return true
 }
 
 func testIntegerObject(t *testing.T, obj object.Object, expected int64) bool {
